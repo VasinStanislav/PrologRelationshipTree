@@ -1,3 +1,5 @@
+DOMAINS
+	sisters = string*
 PREDICATES
 	%To define these:
 	nondeterm Male(string)
@@ -14,6 +16,10 @@ PREDICATES
 	nondeterm Brother(string, string)
 	/*------------------------------------*/
 	nondeterm Grandson(string, string)
+	nondeterm Do_have_same_parent(string, string)
+	nondeterm Get_sisters(string, string)
+	nondeterm Get_length(sisters, integer)
+	nondeterm Does_has_more_than_1_sis(string)
 CLAUSES
 	%Definition:
 	Male("Ivan").
@@ -60,14 +66,32 @@ CLAUSES
 	/* ------------------------------------------ */	
 	Grandson(Grandson1, GrannyOrGrandpa) :- 
 		 Parent(Parent1, Grandson1), Parent(GrannyOrGrandpa, Parent1), Male(Grandson1).
+		 
+	Do_have_same_parent(Child1, Child2) :- 
+		Parent(Who, Child1), Parent(Who, Child2).
+		
+	Get_sisters(Child1, Who) :- 
+		Parent(Father, Child1), Parent(Father, Who), not(Who = Child1), Male(Father), Female(Who).
+		
+	Get_length([], 0).
+	
+	Get_length([_|T], L) :- 
+		Get_length(T, T_length), L = T_length + 1.
+		
+	Does_has_more_than_1_sis(Child1) :- 
+		findall(Who, Get_sisters(Child1, Who), Sisters), Get_length(Sisters, L), L > 1.
+			
 GOAL
 %	Parent("Ivan", "Alla").
 %	Parent(Who, "Larisa").
 %	Parent("Oleg", Who).	
 %	Granddaughter("Natalia", Who).
 %	Parent(Parent1, Child1).
-%	Parent(Who, "Oleg"), Parent(Who, "Nina").
+%	Do_have_same_parent("Oleg", "Nina").
 %	Granddaughter(Who, "Anna"); Grandson(Who2, "Anna").
-	Parent(Parent1, "Larisa"), Parent(Parent1, Who), not(Who = "Larisa"), Male(Parent1).
+%	Parent(Parent1, "Larisa"), Parent(Parent1, Who), not(Who = "Larisa"), Male(Parent1), Female(Who).
+%	Get_sisters("Larisa", Who).
+%	findall(Who, Get_sisters("Larisa", Who), Sisters), Get_length(Sisters, L), L > 1.
+	Does_has_more_than_1_sis("Larisa").
 	
 		
